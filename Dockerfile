@@ -1,34 +1,32 @@
-FROM python:3.11-slim-buster
+# Use the official lightweight Python image.
+FROM python:3.11-slim
 
-# Install system dependencies needed to build dlib and run OpenCV.
+# Ensure Python output is logged immediately.
+ENV PYTHONUNBUFFERED True
+
+# Set the working directory in the container.
+WORKDIR /app
+
+# Copy local code (including shape_predictor_68_face_landmarks.dat) to the container.
+COPY . ./
+
+# Install system dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
-    libgtk-3-dev \
-    libboost-all-dev \
-    python3-dev \
     libopenblas-dev \
     liblapack-dev \
-    libx11-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip to the latest version.
-RUN pip install --no-cache-dir --upgrade pip
+# Upgrade pip.
+RUN pip install --upgrade pip
 
-# Create and set the working directory.
-WORKDIR /app
+# Install all Python dependencies from your requirements.txt.
+RUN pip install -r requirements.txt
 
-# Copy the requirements.txt file.
-COPY requirements.txt /app
-
-# Install the Python dependencies.
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of your application code and models.
-COPY . /app
-
-# Expose the port the Flask app will run on.
+# Expose the port that the Flask app will run on.
 EXPOSE 5000
 
-# Start the Flask app.
+# Start the Flask app using gunicorn.
+# This assumes your Flask app instance is named "app" in main.py.
 CMD ["python", "app.py"]

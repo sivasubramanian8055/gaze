@@ -1,5 +1,4 @@
-# Use an unpinned slim version so you always get the latest updates.
-FROM python:3.11
+FROM python:3.11-slim-buster
 
 # Install system dependencies needed to build dlib and run OpenCV.
 RUN apt-get update && apt-get install -y --no-install-recommends \
